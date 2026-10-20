@@ -134,7 +134,6 @@ total_recaudado_cuotas = (
     df_cuotas["Total Pagado (€)"].sum() - total_recaudado_bebida
 )
 
-# Gastos e Ingresos desde la segunda pestaña
 if not df_gastos.empty and "Tipo (Ingreso/Gasto)" in df_gastos.columns:
   total_ingresos_extra = df_gastos[
       df_gastos["Tipo (Ingreso/Gasto)"] == "Ingreso"
@@ -205,7 +204,6 @@ tab1, tab2 = st.tabs([
 with tab1:
   st.subheader("📊 Estado de Pagos de la Agrupación")
 
-  # --- GENERADOR DE PDF PROFESIONAL CON BOTÓN ARRIBA ---
   def generar_pdf():
     pdf = FPDF()
     pdf.add_page()
@@ -224,7 +222,6 @@ with tab1:
     )
     pdf.ln(10)
 
-    # Cabecera de la tabla PDF
     pdf.set_font("helvetica", "B", 10)
     pdf.set_fill_color(168, 50, 121)
     pdf.set_text_color(255, 255, 255)
@@ -235,7 +232,6 @@ with tab1:
     pdf.cell(25, 8, "Enero", 1, 0, "C", True)
     pdf.cell(30, 8, "Total Pag.", 1, 1, "C", True)
 
-    # Datos de los componentes
     pdf.set_font("helvetica", "", 9)
     pdf.set_text_color(0, 0, 0)
     for _, r in df_cuotas.iterrows():
