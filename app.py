@@ -94,7 +94,6 @@ if "Tipo (Ingreso/Gasto)" not in df_gastos.columns:
   if "Pagado por" in df_gastos.columns:
     df_gastos.rename(columns={"Pagado por": "Responsable"}, inplace=True)
   df_gastos["Tipo (Ingreso/Gasto)"] = "Gasto"
-  # Reordenar columnas
   for col in COLUMNAS_GASTOS:
     if col not in df_gastos.columns:
       df_gastos[col] = ""
@@ -214,7 +213,6 @@ with tab1:
   st.subheader("📊 Estado de Pagos de la Agrupación")
 
 
-  # --- FUNCIÓN PARA GENERAR EL PDF SIN ERRORES ---
   def generar_pdf():
     pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
@@ -236,7 +234,6 @@ with tab1:
     )
     pdf.ln(4)
 
-    # Tabla de Cuotas
     pdf.set_font("helvetica", "B", 8)
     pdf.set_fill_color(168, 50, 121)
     pdf.set_text_color(255, 255, 255)
@@ -261,7 +258,6 @@ with tab1:
 
     pdf.ln(6)
 
-    # Tabla de Gastos e Ingresos
     pdf.set_font("helvetica", "B", 10)
     pdf.cell(
         0, 7, "REGISTRO DE MOVIMIENTOS (GASTOS E INGRESOS)", 0, 1, "L"
@@ -355,8 +351,8 @@ with tab1:
 with tab2:
   st.subheader("💸 Libro de Movimientos (Gastos e Ingresos)")
   st.caption(
-      "Usa esta página para apuntar todo lo que entra y sale de la caja de la"
-      " chirigota."
+      "Usa esta página para apuntar o eliminar lo que entra y sale de la caja"
+      " de la chirigota."
   )
 
   if es_director:
@@ -410,12 +406,29 @@ with tab2:
         st.rerun()
   else:
     st.info(
-        "ℹ️ Solo el director con la clave secreta puede registrar nuevos"
-        " gastos o ingresos."
+        "ℹ️ Solo el director con la clave secreta puede registrar o modificar"
+        " movimientos de caja."
     )
 
   st.write("### 📜 Historial de Apuntes de Caja")
   if not df_gastos.empty:
-    st.dataframe(df_gastos, use_container_width=True, hide_index=True)
+    if es_director:
+      st.caption(
+          "💡 Puedes borrar filas seleccionándolas y pulsando la papelera o"
+          " la tecla Supr en la tabla inferior:"
+      )
+      edited_gastos = st.data_editor(
+          df_gastos,
+          use_container_width=True,
+          hide_index=True,
+          num_rows="dynamic",
+          key="editor_gastos_tabla",
+      )
+      if st.button("💾 Guardar Cambios del Historial de Caja", type="secondary"):
+        edited_gastos.to_csv(DB_GASTOS, index=False)
+        st.success("¡Historial de caja actualizado correctamente!")
+        st.rerun()
+    else:
+      st.dataframe(df_gastos, use_container_width=True, hide_index=True)
   else:
     st.info("Todavía no hay movimientos registrados.")
