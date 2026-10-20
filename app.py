@@ -21,6 +21,14 @@ COLUMNAS_CUOTAS = [
     "Diciembre (50€)",
     "Enero (50€)",
 ]
+COLUMNAS_GASTOS = [
+    "Fecha",
+    "Tipo (Ingreso/Gasto)",
+    "Concepto",
+    "Categoría",
+    "Importe (€)",
+    "Responsable",
+]
 
 if not os.path.exists(DB_CUOTAS):
   componentes = [
@@ -49,16 +57,7 @@ if not os.path.exists(DB_CUOTAS):
   df_ini.to_csv(DB_CUOTAS, index=False)
 
 if not os.path.exists(DB_GASTOS):
-  df_g_ini = pd.DataFrame(
-      columns=[
-          "Fecha",
-          "Tipo (Ingreso/Gasto)",
-          "Concepto",
-          "Categoría",
-          "Importe (€)",
-          "Responsable",
-      ]
-  )
+  df_g_ini = pd.DataFrame(columns=COLUMNAS_GASTOS)
   df_g_ini.to_csv(DB_GASTOS, index=False)
 
 df_cuotas = pd.read_csv(DB_CUOTAS)
@@ -89,7 +88,18 @@ else:
       "Enero (50€)": ["Pendiente"] * len(componentes),
   })
 
+# Carga segura y migración automática de la base de datos de gastos
 df_gastos = pd.read_csv(DB_GASTOS)
+if "Tipo (Ingreso/Gasto)" not in df_gastos.columns:
+  if "Pagado por" in df_gastos.columns:
+    df_gastos.rename(columns={"Pagado por": "Responsable"}, inplace=True)
+  df_gastos["Tipo (Ingreso/Gasto)"] = "Gasto"
+  # Reordenar columnas
+  for col in COLUMNAS_GASTOS:
+    if col not in df_gastos.columns:
+      df_gastos[col] = ""
+  df_gastos = df_gastos[COLUMNAS_GASTOS]
+  df_gastos.to_csv(DB_GASTOS, index=False)
 
 # --- CONTROL DE ACCESO ---
 st.sidebar.markdown("## 🔐 Llave del Local (Control)")
@@ -204,7 +214,7 @@ with tab1:
   st.subheader("📊 Estado de Pagos de la Agrupación")
 
 
-  # --- FUNCIÓN PARA GENERAR EL PDF SIN ERRORES DE CODIFICACIÓN ---
+  # --- FUNCIÓN PARA GENERAR EL PDF SIN ERRORES ---
   def generar_pdf():
     pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
@@ -271,19 +281,18 @@ with tab1:
     pdf.set_text_color(0, 0, 0)
     if not df_gastos.empty:
       for _, g in df_gastos.iterrows():
-        pdf.cell(22, 6, str(g.iloc[0]), 1, 0, "C")
-        pdf.cell(20, 6, str(g.iloc[1]), 1, 0, "C")
-        pdf.cell(66, 6, str(g.iloc[2]), 1, 0, "L")
-        pdf.cell(38, 6, str(g.iloc[3]), 1, 0, "L")
-        pdf.cell(22, 6, f"{g.iloc[4]} EUR", 1, 0, "R")
-        pdf.cell(24, 6, str(g.iloc[5]), 1, 1, "C")
+        pdf.cell(22, 6, str(g["Fecha"]), 1, 0, "C")
+        pdf.cell(20, 6, str(g["Tipo (Ingreso/Gasto)"]), 1, 0, "C")
+        pdf.cell(66, 6, str(g["Concepto"]), 1, 0, "L")
+        pdf.cell(38, 6, str(g["Categoría"]), 1, 0, "L")
+        pdf.cell(22, 6, f"{g['Importe (€)']} EUR", 1, 0, "R")
+        pdf.cell(24, 6, str(g["Responsable"]), 1, 1, "C")
     else:
       pdf.cell(192, 6, "No hay movimientos registrados.", 1, 1, "C")
 
     return bytes(pdf.output())
 
 
-  # Botón de descarga de PDF bien visible arriba
   pdf_bytes = generar_pdf()
   st.download_button(
       label="📥 Descargar Acta Completa en PDF",
