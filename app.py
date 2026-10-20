@@ -256,22 +256,22 @@ with tab1:
 
         pdf.set_fill_color(245, 245, 245)
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(190, 7, f" Saldo Total: {saldo_total_caja:,.2f} EUR    |    Bote Bebida (10€): {total_recaudado_bebida:,.2f} EUR    |    Cuotas (50€/mes): {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
+        pdf.cell(190, 7, f" Saldo Total: {saldo_total_caja:,.2f} EUR    |    Bote Bebida (10 EUR): {total_recaudado_bebida:,.2f} EUR    |    Cuotas (50 EUR/mes): {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
         pdf.ln(5)
 
         pdf.set_font("helvetica", "B", 10)
         pdf.set_text_color(50, 50, 50)
-        pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES (Bote: 10€ | Cuotas Mensuales: 50€)", 0, 1, "L")
+        pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES (Bote: 10 EUR | Cuotas Mensuales: 50 EUR)", 0, 1, "L")
         pdf.ln(2)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(168, 50, 121)
         pdf.set_text_color(255, 255, 255)
         pdf.cell(45, 6, "Componente", 1, 0, "C", True)
-        pdf.cell(22, 6, "Bote (10€)", 1, 0, "C", True)
-        pdf.cell(22, 6, "Nov. (50€)", 1, 0, "C", True)
-        pdf.cell(22, 6, "Dic. (50€)", 1, 0, "C", True)
-        pdf.cell(22, 6, "Enero (50€)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Bote (10 EUR)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Nov. (50 EUR)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Dic. (50 EUR)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Enero (50 EUR)", 1, 0, "C", True)
         pdf.cell(26, 6, "Tot. Pag.", 1, 0, "C", True)
         pdf.cell(26, 6, "Tot. Pend.", 1, 1, "C", True)
 
