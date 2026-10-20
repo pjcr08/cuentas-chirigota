@@ -195,65 +195,103 @@ with col3:
 
 st.write("---")
 
-# --- ORGANIZACIÓN EN 2 PESTAÑAS PRINCIPALES ---
 tab1, tab2 = st.tabs([
     "📋 Cuadro de Componentes y Cuotas",
     "💸 Registro de Gastos e Ingresos",
-])
+] )
 
 with tab1:
   st.subheader("📊 Estado de Pagos de la Agrupación")
 
+
+  # --- FUNCIÓN PARA GENERAR EL PDF PROFESIONAL ---
   def generar_pdf():
-    pdf = FPDF()
+    pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
-    pdf.set_font("helvetica", "B", 16)
+    pdf.set_font("helvetica", "B", 14)
     pdf.cell(
-        0, 10, 'CHIRIGOTA "LA PALETA" - ACTA DE CUOTAS', 0, 1, "C"
+        0, 10, 'CHIRIGOTA "LA PALETA" - ACTA FINANCIERA', 0, 1, "C"
     )
-    pdf.set_font("helvetica", "I", 10)
+
+    pdf.set_font("helvetica", "", 9)
     pdf.cell(
         0,
         6,
-        f"Saldo Total en Caja: {saldo_total_caja:,.2f} Euros",
+        f"Saldo Total en Caja: {saldo_total_caja:,.2f} €  |  Bote Bebida:"
+        f" {total_recaudado_bebida:,.2f} €  |  Cuotas:"
+        f" {total_recaudado_cuotas:,.2f} €",
         0,
         1,
         "C",
     )
-    pdf.ln(10)
+    pdf.ln(4)
 
-    pdf.set_font("helvetica", "B", 10)
+    # Tabla de Cuotas (con Total Pagado y Pendiente)
+    pdf.set_font("helvetica", "B", 8)
     pdf.set_fill_color(168, 50, 121)
     pdf.set_text_color(255, 255, 255)
-    pdf.cell(60, 8, "Componente", 1, 0, "C", True)
-    pdf.cell(25, 8, "Bote", 1, 0, "C", True)
-    pdf.cell(25, 8, "Nov.", 1, 0, "C", True)
-    pdf.cell(25, 8, "Dic.", 1, 0, "C", True)
-    pdf.cell(25, 8, "Enero", 1, 0, "C", True)
-    pdf.cell(30, 8, "Total Pag.", 1, 1, "C", True)
+    pdf.cell(45, 7, "Componente", 1, 0, "C", True)
+    pdf.cell(22, 7, "Bote", 1, 0, "C", True)
+    pdf.cell(22, 7, "Nov.", 1, 0, "C", True)
+    pdf.cell(22, 7, "Dic.", 1, 0, "C", True)
+    pdf.cell(22, 7, "Enero", 1, 0, "C", True)
+    pdf.cell(26, 7, "Tot. Pag.", 1, 0, "C", True)
+    pdf.cell(26, 7, "Tot. Pend.", 1, 1, "C", True)
 
-    pdf.set_font("helvetica", "", 9)
+    pdf.set_font("helvetica", "", 8)
     pdf.set_text_color(0, 0, 0)
     for _, r in df_cuotas.iterrows():
-      pdf.cell(60, 7, str(r.iloc[0]), 1, 0, "L")
-      pdf.cell(25, 7, str(r.iloc[1]), 1, 0, "C")
-      pdf.cell(25, 7, str(r.iloc[2]), 1, 0, "C")
-      pdf.cell(25, 7, str(r.iloc[3]), 1, 0, "C")
-      pdf.cell(25, 7, str(r.iloc[4]), 1, 0, "C")
-      pdf.cell(30, 7, f"{r['Total Pagado (€)']} EUR", 1, 1, "C")
+      pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L")
+      pdf.cell(22, 6, str(r.iloc[1]), 1, 0, "C")
+      pdf.cell(22, 6, str(r.iloc[2]), 1, 0, "C")
+      pdf.cell(22, 6, str(r.iloc[3]), 1, 0, "C")
+      pdf.cell(22, 6, str(r.iloc[4]), 1, 0, "C")
+      pdf.cell(26, 6, f"{r['Total Pagado (€)']} EUR", 1, 0, "C")
+      pdf.cell(26, 6, f"{r['Total Pendiente (€)']} EUR", 1, 1, "C")
+
+    pdf.ln(6)
+
+    # Tabla de Gastos e Ingresos
+    pdf.set_font("helvetica", "B", 10)
+    pdf.cell(
+        0, 7, "REGISTRO DE MOVIMIENTOS (GASTOS E INGRESOS)", 0, 1, "L"
+    )
+
+    pdf.set_font("helvetica", "B", 8)
+    pdf.set_fill_color(50, 50, 50)
+    pdf.set_text_color(255, 255, 255)
+    pdf.cell(22, 6, "Fecha", 1, 0, "C", True)
+    pdf.cell(20, 6, "Tipo", 1, 0, "C", True)
+    pdf.cell(66, 6, "Concepto", 1, 0, "C", True)
+    pdf.cell(38, 6, "Categoría", 1, 0, "C", True)
+    pdf.cell(22, 6, "Importe", 1, 0, "C", True)
+    pdf.cell(24, 6, "Resp.", 1, 1, "C", True)
+
+    pdf.set_font("helvetica", "", 8)
+    pdf.set_text_color(0, 0, 0)
+    if not df_gastos.empty:
+      for _, g in df_gastos.iterrows():
+        pdf.cell(22, 6, str(g.iloc[0]), 1, 0, "C")
+        pdf.cell(20, 6, str(g.iloc[1]), 1, 0, "C")
+        pdf.cell(66, 6, str(g.iloc[2]), 1, 0, "L")
+        pdf.cell(38, 6, str(g.iloc[3]), 1, 0, "L")
+        pdf.cell(22, 6, f"{g.iloc[4]} EUR", 1, 0, "R")
+        pdf.cell(24, 6, str(g.iloc[5]), 1, 1, "C")
+    else:
+      pdf.cell(192, 6, "No hay movimientos registrados.", 1, 1, "C")
 
     return bytes(pdf.output())
 
-  col_btn1, col_btn2 = st.columns([2, 3])
-  with col_btn1:
-    pdf_data = generar_pdf()
-    st.download_button(
-        label="📥 Descargar Acta Completa en PDF",
-        data=pdf_data,
-        file_name="acta_cuotas_la_paleta.pdf",
-        mime="application/pdf",
-        type="primary",
-    )
+
+  # Botón de descarga de PDF bien visible arriba
+  pdf_bytes = generar_pdf()
+  st.download_button(
+      label="📥 Descargar Acta Completa en PDF",
+      data=pdf_bytes,
+      file_name="acta_cuotas_y_gastos_la_paleta.pdf",
+      mime="application/pdf",
+      type="primary",
+  )
 
   if not es_director:
     st.warning(
@@ -309,7 +347,7 @@ with tab2:
   st.subheader("💸 Libro de Movimientos (Gastos e Ingresos)")
   st.caption(
       "Usa esta página para apuntar todo lo que entra y sale de la caja de la"
-      " chirigota (compras de telones, bebidas, ensayos, subvenciones, etc.)."
+      " chirigota."
   )
 
   if es_director:
