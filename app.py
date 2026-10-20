@@ -8,7 +8,6 @@ st.set_page_config(page_title="Chirigota La Paleta 🎭", layout="wide", initial
 # --- BASE DE DATOS LOCAL/NUBE (Persistencia de datos) ---
 DB_CUOTAS = "cuotas_chirigota.csv"
 DB_GASTOS = "gastos_chirigota.csv"
-
 COLUMNAS_CUOTAS = ["Componente", "Bote Bebida (10€)", "Noviembre (50€)", "Diciembre (50€)", "Enero (50€)"]
 
 if not os.path.exists(DB_CUOTAS):
@@ -34,17 +33,22 @@ if len(df_cuotas.columns) >= 5:
     df_cuotas.columns = COLUMNAS_CUOTAS[:len(df_cuotas.columns)]
 else:
     componentes = ["PEDRO JAVIER", "PEDRO ALEJANDRO", "PEDROLOSE", "PEDROJOSE", "PEDRITO", "PE", "JUANJE", "RAFA", "SEBA", "FALU", "CONDE", "FRAN", "JUAN CARLOS", "VICTOR"]
-    df_cuotas = pd.DataFrame({"Componente": componentes, "Bote Bebida (10€)": ["Pagado"] * 14, "Noviembre (50€)": ["Pendiente"] * 14, "Diciembre (50€)": ["Pendiente"] * 14, "Enero (50€)": ["Pendiente"] * 14})
+    df_cuotas = pd.DataFrame({
+        "Componente": componentes, 
+        "Bote Bebida (10€)": ["Pagado"] * 14, 
+        "Noviembre (50€)": ["Pendiente"] * 14, 
+        "Diciembre (50€)": ["Pendiente"] * 14, 
+        "Enero (50€)": ["Pendiente"] * 14
+    })
 
 df_gastos = pd.read_csv(DB_GASTOS)
 
 # --- CONTROL DE ACCESO (SOLO PARA EL DIRECTOR) ---
 st.sidebar.markdown("## 🔐 Llave del Local (Control)")
 st.sidebar.caption("Los componentes pueden ver todo, pero solo tú puedes modificar introduciendo la clave de la agrupación.")
-contraseña_usuario = st.sidebar.text_input("Introduce la Clave Secreta:", type="password")
 
-# Cambia "lapaleta2027" por la contraseña que tú quieras
-CLAVE_CORRECTA = "lapaleta2027" 
+contraseña_usuario = st.sidebar.text_input("Introduce la Clave Secreta:", type="password")
+CLAVE_CORRECTA = "lapaleta2027"
 es_director = (contraseña_usuario == CLAVE_CORRECTA)
 
 if es_director:
@@ -80,21 +84,19 @@ st.markdown("""
         <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 2px; margin-bottom: 0px;'>🎭 Chirigota: LA PALETA 🎭</h1>
         <p style='color: #fff; font-size: 18px; font-style: italic; margin-top: 5px;'>¡Vaya una que nos vais a liar! Controles al milímetro para el Concurso</p>
         <span style='font-size: 24px;'>🎉🎸🎺🥁🍻🪗🎭</span>
-    </div>
-""", unsafe_allow_html=True)
+    </div>""", unsafe_allow_html=True)
 
-# Marcadores visuales simulando bombillas del Falla
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(f"<div style='background-color: #2b2b2b; padding: 15px; border-radius: 10px; border-left: 5px solid #FFD700; text-align: center;'><h5 style='margin:0; color:#aaa;'>💰 El Tesoro del Falla (Total)</h5><h2 style='margin:0; color:#FFD700;'>{saldo_total_caja:,.2f} €</h2></div>", unsafe_allow_html=True)
 with col2:
-    st.markdown(f"<div style='background-color: #2b2b2b; padding: 15px; border-radius: 10px; border-left: 5px solid #4CAF50; text-align: center;'><h5 style='margin:0; color:#aaa;'>🍺 El Bote de la Nevera</h5><h2 style='margin:0; color:#4CAF50;'>{saldo_barra:,.2f} €</h2><caption style='color:#666;'>Recaudado: {total_recaudado_bebida}€</caption></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background-color: #2b2b2b; padding: 15px; border-radius: 10px; border-left: 5px solid #4CAF50; text-align: center;'><h5 style='margin:0; color:#aaa;'>🍺 El Bote de la Nevera</h5><h2 style='margin:0; color:#4CAF50;'>{saldo_barra:,.2f} €</h2></div>", unsafe_allow_html=True)
 with col3:
-    st.markdown(f"<div style='background-color: #2b2b2b; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3; text-align: center;'><h5 style='margin:0; color:#aaa;'>🧵 Para Forillos, Telas y Tipos</h5><h2 style='margin:0; color:#2196F3;'>{saldo_general:,.2f} €</h2><caption style='color:#666;'>Recaudado: {total_recaudado_cuotas}€</caption></div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background-color: #2b2b2b; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3; text-align: center;'><h5 style='margin:0; color:#aaa;'>🧵 Para Forillos, Telas y Tipos</h5><h2 style='margin:0; color:#2196F3;'>{saldo_general:,.2f} €</h2></div>", unsafe_allow_html=True)
 
 st.write("---")
 
-tab1, tab2, tab3 = st.tabs(["📋 Lista de la Agrupación", "💸 Registro de Gastos y Libretas", "🖨️ Imprimir Libreto de Cuentas"])
+tab1, tab2, tab3 = st.tabs(["📋 Lista de la Agrupación", "💸 Registro de Gastos", "🖨️ Imprimir Libreto de Cuentas"])
 
 with tab1:
     st.subheader("📊 Estado de Ensayos y Cuotas")
@@ -160,17 +162,45 @@ with tab3:
     
     tabla_html = ""
     for _, r in df_cuotas.iterrows():
+        c_bote = "green" if r.iloc[1] == "Pagado" else "red"
+        c_nov = "green" if r.iloc[2] == "Pagado" else "red"
+        c_dic = "green" if r.iloc[3] == "Pagado" else "red"
+        c_ene = "green" if r.iloc[4] == "Pagado" else "red"
+        
         tabla_html += f"""
         <tr>
             <td style='padding: 8px; border: 1px solid #ddd; font-weight: bold;'>{r.iloc[0]}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {"green" if r.iloc[1]=="Pagado" else "red"}'>{r.iloc[1]}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {"green" if r.iloc[2]=="Pagado" else "red"}'>{r.iloc[2]}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {"green" if r.iloc[3]=="Pagado" else "red"}'>{r.iloc[3]}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {"green" if r.iloc[4]=="Pagado" else "red"}'>{r.iloc[4]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {c_bote};'>{r.iloc[1]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {c_nov};'>{r.iloc[2]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {c_dic};'>{r.iloc[3]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center; color: {c_ene};'>{r.iloc[4]}</td>
             <td style='padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold; background-color: #f9f9f9;'>{r['Total Pagado (€)']}€</td>
         </tr>
         """
 
     html_informe = f"""
-    <div style='background-color: white; color: black; padding: 30px; font-family: "Courier New", Courier, monospace; border: 3px double #A83279; border-radius: 10px;'>
+    <div style='background-color: white; color: black; padding: 30px; font-family: sans-serif; border: 3px double #A83279; border-radius: 10px;'>
         <h2 style='text-align: center; color: #A83279; margin-bottom: 5px; font-weight: bold;'>🎭 CHIRIGOTA "LA PALETA" - ACTA FINANCIERA 🎭</h2>
+        <hr style='border: 1px solid #A83279; margin-bottom: 20px;'>
+        <p><b>💰 Saldo Total:</b> {saldo_total_caja:,.2f} €</p>
+        <p><b>🍺 Caja Nevera:</b> {saldo_barra:,.2f} €</p>
+        <p><b>🎬 Caja Telón/Tipo:</b> {saldo_general:,.2f} €</p>
+        <h3 style='color: #A83279; margin-top: 20px;'>📋 Cuadrante General de Cuotas</h3>
+        <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
+            <thead>
+                <tr style='background-color: #f2f2f2;'>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Componente</th>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Bote Barra (10€)</th>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Noviembre (50€)</th>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Diciembre (50€)</th>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Enero (50€)</th>
+                    <th style='padding: 8px; border: 1px solid #ddd;'>Total Entregado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {tabla_html}
+            </tbody>
+        </table>
+    </div>
+    """
+    st.markdown(html_informe, unsafe_allow_html=True)
