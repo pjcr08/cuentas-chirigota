@@ -8,34 +8,20 @@ import streamlit as st
 st.set_page_config(
     page_title="Chirigota La Paleta 🎭",
     layout="wide",
-    initial_sidebar_state="collapsed", # Contraído por defecto en móvil para ganar espacio
+    initial_sidebar_state="collapsed",
 )
 
 # --- ESTILOS CSS ADAPTATIVOS PARA MÓVIL ---
 st.markdown(
     """
     <style>
-    /* Ajustes generales para pantallas pequeñas */
     @media (max-width: 768px) {
-        h1 {
-            font-size: 1.5rem !important;
-        }
-        h2 {
-            font-size: 1.2rem !important;
-        }
-        h3 {
-            font-size: 1rem !important;
-        }
-        /* Botones e inputs a ancho completo en móvil para facilitar el toque */
-        .stButton button, .stDownloadButton button {
-            width: 100% !important;
-        }
+        h1 { font-size: 1.4rem !important; }
+        h2 { font-size: 1.1rem !important; }
+        h3 { font-size: 0.95rem !important; }
+        .stButton button, .stDownloadButton button { width: 100% !important; }
     }
-    /* Estética general de contenedores */
-    .block-container {
-        padding-top: 1.5rem;
-        padding-bottom: 2rem;
-    }
+    .block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -120,7 +106,6 @@ else:
         "Enero (50€)": ["Pendiente"] * len(componentes),
     })
 
-# Carga segura de la base de datos de gastos
 df_gastos = pd.read_csv(DB_GASTOS)
 if "Tipo (Ingreso/Gasto)" not in df_gastos.columns:
     if "Pagado por" in df_gastos.columns:
@@ -196,7 +181,7 @@ saldo_total_caja = (
     - total_gastos
 )
 
-# --- CABECERA VISUAL ADAPTATIVA ---
+# --- CABECERA VISUAL CON LOGO MEJORADO ---
 col_logo, col_titulo = st.columns([1, 4])
 with col_logo:
     if os.path.exists(LOGO_PATH):
@@ -257,13 +242,13 @@ with tab1:
         pdf.add_page()
         
         if os.path.exists(LOGO_PATH):
-            pdf.image(LOGO_PATH, x=15, y=10, w=28)
+            pdf.image(LOGO_PATH, x=15, y=10, w=25)
         
-        pdf.set_font("helvetica", "B", 16)
+        pdf.set_font("helvetica", "B", 15)
         pdf.set_text_color(168, 50, 121)
-        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
+        pdf.cell(0, 8, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
         
-        pdf.set_font("helvetica", "I", 10)
+        pdf.set_font("helvetica", "I", 9)
         pdf.set_text_color(100, 100, 100)
         pdf.cell(0, 5, 'Resumen Financiero Oficial', 0, 1, "C")
         
@@ -272,10 +257,10 @@ with tab1:
 
         pdf.set_fill_color(245, 245, 245)
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(190, 8, f" Saldo Total: {saldo_total_caja:,.2f} EUR   |   Bote Bebida: {total_recaudado_bebida:,.2f} EUR   |   Cuotas: {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
-        pdf.ln(6)
+        pdf.cell(190, 7, f" Saldo Total: {saldo_total_caja:,.2f} EUR   |   Bote Bebida: {total_recaudado_bebida:,.2f} EUR   |   Cuotas: {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
+        pdf.ln(5)
 
-        pdf.set_font("helvetica", "B", 11)
+        pdf.set_font("helvetica", "B", 10)
         pdf.set_text_color(50, 50, 50)
         pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES", 0, 1, "L")
         pdf.ln(2)
@@ -283,46 +268,49 @@ with tab1:
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(168, 50, 121)
         pdf.set_text_color(255, 255, 255)
-        pdf.cell(45, 7, "Componente", 1, 0, "C", True)
-        pdf.cell(22, 7, "Bote", 1, 0, "C", True)
-        pdf.cell(22, 7, "Nov.", 1, 0, "C", True)
-        pdf.cell(22, 7, "Dic.", 1, 0, "C", True)
-        pdf.cell(22, 7, "Enero", 1, 0, "C", True)
-        pdf.cell(26, 7, "Tot. Pag.", 1, 0, "C", True)
-        pdf.cell(26, 7, "Tot. Pend.", 1, 1, "C", True)
+        pdf.cell(45, 6, "Componente", 1, 0, "C", True)
+        pdf.cell(22, 6, "Bote", 1, 0, "C", True)
+        pdf.cell(22, 6, "Nov.", 1, 0, "C", True)
+        pdf.cell(22, 6, "Dic.", 1, 0, "C", True)
+        pdf.cell(22, 6, "Enero", 1, 0, "C", True)
+        pdf.cell(26, 6, "Tot. Pag.", 1, 0, "C", True)
+        pdf.cell(26, 6, "Tot. Pend.", 1, 1, "C", True)
 
         pdf.set_font("helvetica", "", 8)
         pdf.set_text_color(0, 0, 0)
-        for i, r in df_cuotas.iterrows():
-            if i % 2 == 0:
-                pdf.set_fill_color(255, 255, 255)
-            else:
-                pdf.set_fill_color(250, 250, 250)
-                
-            pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L", True)
-            pdf.cell(22, 6, str(r.iloc[1]), 1, 0, "C", True)
-            pdf.cell(22, 6, str(r.iloc[2]), 1, 0, "C", True)
-            pdf.cell(22, 6, str(r.iloc[3]), 1, 0, "C", True)
-            pdf.cell(22, 6, str(r.iloc[4]), 1, 0, "C", True)
-            pdf.cell(26, 6, f"{r['Total Pagado (€)']} EUR", 1, 0, "C", True)
-            pdf.cell(26, 6, f"{r['Total Pendiente (€)']} EUR", 1, 1, "C", True)
+        
+        for _, r in df_cuotas.iterrows():
+            pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L")
+            
+            # Celdas con color condicional (Verde si Pagado, Amarillo si Pendiente)
+            for col_idx in range(1, 5):
+                val = str(r.iloc[col_idx])
+                if val == "Pagado":
+                    pdf.set_fill_color(220, 245, 220)  # Verde suave
+                elif val == "Pendiente":
+                    pdf.set_fill_color(255, 243, 205)  # Amarillo suave
+                else:
+                    pdf.set_fill_color(255, 255, 255)
+                pdf.cell(22, 6, val, 1, 0, "C", True)
 
-        pdf.ln(8)
+            pdf.cell(26, 6, f"{r['Total Pagado (€)']} EUR", 1, 0, "C")
+            pdf.cell(26, 6, f"{r['Total Pendiente (€)']} EUR", 1, 1, "C")
 
-        pdf.set_font("helvetica", "B", 11)
-        pdf.set_text_color(50, 50, 50)
+        pdf.ln(6)
+
+        pdf.set_font("helvetica", "B", 10)
         pdf.cell(0, 6, "REGISTRO DE MOVIMIENTOS (GASTOS E INGRESOS)", 0, 1, "L")
         pdf.ln(2)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(50, 50, 50)
         pdf.set_text_color(255, 255, 255)
-        pdf.cell(22, 7, "Fecha", 1, 0, "C", True)
-        pdf.cell(20, 7, "Tipo", 1, 0, "C", True)
-        pdf.cell(66, 7, "Concepto", 1, 0, "C", True)
-        pdf.cell(38, 7, "Categoría", 1, 0, "C", True)
-        pdf.cell(22, 7, "Importe", 1, 0, "C", True)
-        pdf.cell(22, 7, "Resp.", 1, 1, "C", True)
+        pdf.cell(22, 6, "Fecha", 1, 0, "C", True)
+        pdf.cell(20, 6, "Tipo", 1, 0, "C", True)
+        pdf.cell(66, 6, "Concepto", 1, 0, "C", True)
+        pdf.cell(38, 6, "Categoría", 1, 0, "C", True)
+        pdf.cell(22, 6, "Importe", 1, 0, "C", True)
+        pdf.cell(22, 6, "Resp.", 1, 1, "C", True)
 
         pdf.set_font("helvetica", "", 8)
         pdf.set_text_color(0, 0, 0)
@@ -362,31 +350,51 @@ with tab1:
     if not es_director:
         st.warning("⚠️ Modo lectura. Introduce la contraseña lateral para editar.")
 
-    column_config = {
-        "Componente": st.column_config.TextColumn("Componente", disabled=not es_director),
-        "Bote Bebida (10€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
-        "Noviembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
-        "Diciembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
-        "Enero (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
-        "Total Pagado (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
-        "Total Pendiente (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
-    }
-
-    edited_df = st.data_editor(
-        df_cuotas,
-        column_config=column_config,
-        use_container_width=True,
-        hide_index=True,
-        num_rows="dynamic" if es_director else "fixed",
-        height=450,
-    )
+    # --- FUNCIÓN DE ESTILO PARA LAS CUOTAS EN PANTALLA ---
+    def colorear_cuotas(val):
+        if val == "Pagado":
+            return "background-color: #d4edda; color: #155724; font-weight: bold;"
+        elif val == "Pendiente":
+            return "background-color: #fff3cd; color: #856404; font-weight: bold;"
+        return ""
 
     if es_director:
-        if st.button("💾 Guardar Cambios Cuotas", type="secondary"):
-            save_df = edited_df.drop(columns=["Total Pagado (€)", "Total Pendiente (€)"])
-            save_df.to_csv(DB_CUOTAS, index=False)
-            st.success("¡Cuotas guardadas con éxito!")
-            st.rerun()
+        modo_edicion_cuotas = st.toggle("✏️ Activar Editor de Cuotas", value=True)
+        if modo_edicion_cuotas:
+            column_config = {
+                "Componente": st.column_config.TextColumn("Componente", disabled=False),
+                "Bote Bebida (10€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"]),
+                "Noviembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"]),
+                "Diciembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"]),
+                "Enero (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"]),
+                "Total Pagado (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
+                "Total Pendiente (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
+            }
+            edited_df = st.data_editor(
+                df_cuotas,
+                column_config=column_config,
+                use_container_width=True,
+                hide_index=True,
+                num_rows="dynamic",
+                height=450,
+            )
+            if st.button("💾 Guardar Cambios Cuotas", type="secondary"):
+                save_df = edited_df.drop(columns=["Total Pagado (€)", "Total Pendiente (€)"])
+                save_df.to_csv(DB_CUOTAS, index=False)
+                st.success("¡Cuotas guardadas con éxito!")
+                st.rerun()
+        else:
+            st.dataframe(
+                df_cuotas.style.map(colorear_cuotas, subset=["Bote Bebida (10€)", "Noviembre (50€)", "Diciembre (50€)", "Enero (50€)"]),
+                use_container_width=True,
+                hide_index=True,
+            )
+    else:
+        st.dataframe(
+            df_cuotas.style.map(colorear_cuotas, subset=["Bote Bebida (10€)", "Noviembre (50€)", "Diciembre (50€)", "Enero (50€)"]),
+            use_container_width=True,
+            hide_index=True,
+        )
 
 with tab2:
     st.subheader("💸 Libro de Caja")
@@ -432,7 +440,7 @@ with tab2:
 
     st.write("### 📜 Historial")
 
-    def colorear_filas(row):
+    def colorear_filas_gastos(row):
         tipo = str(row.get("Tipo (Ingreso/Gasto)", "")).strip()
         if tipo == "Ingreso":
             return ["background-color: #d4edda; color: #155724; font-weight: bold;"] * len(row)
@@ -442,7 +450,7 @@ with tab2:
 
     if not df_gastos.empty:
         if es_director:
-            modo_edicion = st.toggle("✏️ Modo Editor / Borrador", value=False)
+            modo_edicion = st.toggle("✏️ Modo Editor / Borrador de Caja", value=False)
             
             if modo_edicion:
                 edited_gastos = st.data_editor(
@@ -458,13 +466,13 @@ with tab2:
                     st.rerun()
             else:
                 st.dataframe(
-                    df_gastos.style.apply(colorear_filas, axis=1),
+                    df_gastos.style.map(colorear_filas_gastos),
                     use_container_width=True,
                     hide_index=True,
                 )
         else:
             st.dataframe(
-                df_gastos.style.apply(colorear_filas, axis=1),
+                df_gastos.style.map(colorear_filas_gastos),
                 use_container_width=True,
                 hide_index=True,
             )
