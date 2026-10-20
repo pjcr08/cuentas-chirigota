@@ -35,10 +35,10 @@ else:
     componentes = ["PEDRO JAVIER", "PEDRO ALEJANDRO", "PEDROLOSE", "PEDROJOSE", "PEDRITO", "PE", "JUANJE", "RAFA", "SEBA", "FALU", "CONDE", "FRAN", "JUAN CARLOS", "VICTOR"]
     df_cuotas = pd.DataFrame({
         "Componente": componentes, 
-        "Bote Bebida (10€)": ["Pagado"] * 14, 
-        "Noviembre (50€)": ["Pendiente"] * 14, 
-        "Diciembre (50€)": ["Pendiente"] * 14, 
-        "Enero (50€)": ["Pendiente"] * 14
+        "Bote Bebida (10€)": ["Pagado"] * len(componentes), 
+        "Noviembre (50€)": ["Pendiente"] * len(componentes), 
+        "Diciembre (50€)": ["Pendiente"] * len(componentes), 
+        "Enero (50€)": ["Pendiente"] * len(componentes)
     })
 
 df_gastos = pd.read_csv(DB_GASTOS)
@@ -59,16 +59,16 @@ else:
 # --- CÁLCULOS ---
 def calcular_total_pagado(row):
     total = 0
-    if row.iloc[1] == "Pagado": total += 10
-    if row.iloc[2] == "Pagado": total += 50
-    if row.iloc[3] == "Pagado": total += 50
-    if row.iloc[4] == "Pagado": total += 50
+    if len(row) > 1 and row.iloc[1] == "Pagado": total += 10
+    if len(row) > 2 and row.iloc[2] == "Pagado": total += 50
+    if len(row) > 3 and row.iloc[3] == "Pagado": total += 50
+    if len(row) > 4 and row.iloc[4] == "Pagado": total += 50
     return total
 
 df_cuotas["Total Pagado (€)"] = df_cuotas.apply(calcular_total_pagado, axis=1)
 df_cuotas["Total Pendiente (€)"] = 160 - df_cuotas["Total Pagado (€)"]
 
-total_recaudado_bebida = (df_cuotas.iloc[:, 1] == "Pagado").sum() * 10
+total_recaudado_bebida = (df_cuotas.iloc[:, 1] == "Pagado").sum() * 10 if len(df_cuotas.columns) > 1 else 0
 total_recaudado_cuotas = df_cuotas["Total Pagado (€)"].sum() - total_recaudado_bebida
 
 gastos_bebida = df_gastos[df_gastos["Categoría"] == "🍺 Bebida / Barra"]["Importe (€)"].sum() if not df_gastos.empty else 0
@@ -103,9 +103,10 @@ with tab1:
     if not es_director:
         st.warning("⚠️ Modo consulta activado. Para marcar un pago, introduce la clave secreta en el menú de la izquierda.")
     else:
-        st.success("🔓 ¡Modo Administrador activado! Puedes cambiar los Pendientes por Pagados en la tabla.")
+        st.success("🔓 ¡Modo Administrador activado! Puedes añadir, borrar o editar componentes y cambiar pagos libremente en la tabla.")
     
     column_config = {
+        "Componente": st.column_config.TextColumn("Componente", disabled=not es_director),
         "Bote Bebida (10€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
         "Noviembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
         "Diciembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
@@ -114,7 +115,13 @@ with tab1:
         "Total Pendiente (€)": st.column_config.NumberColumn(format="%d €", disabled=True)
     }
     
-    edited_df = st.data_editor(df_cuotas, column_config=column_config, use_container_width=True, hide_index=True)
+    edited_df = st.data_editor(
+        df_cuotas, 
+        column_config=column_config, 
+        use_container_width=True, 
+        hide_index=True, 
+        num_rows="dynamic"  # Permite añadir y eliminar filas
+    )
     
     if es_director:
         if st.button("💾 Guardar Tabla de Pagos", type="primary"):
