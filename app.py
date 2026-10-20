@@ -9,7 +9,10 @@ st.set_page_config(page_title="Chirigota La Paleta", layout="wide", initial_side
 DB_CUOTAS = "cuotas_chirigota.csv"
 DB_GASTOS = "gastos_chirigota.csv"
 
-# Inicializar datos si no existen con tus 14 componentes exactos
+# Forzar nombres limpios y fijos de columnas para evitar conflictos con archivos viejos
+COLUMNAS_CUOTAS = ["Componente", "Bote Bebida (10€)", "Noviembre (50€)", "Diciembre (50€)", "Enero (50€)"]
+
+# Inicializar datos si no existen o reconstruir si hay conflicto
 if not os.path.exists(DB_CUOTAS):
     componentes = [
         "PEDRO JAVIER", "PEDRO ALEJANDRO", "PEDROLOSE", "PEDROJOSE", "PEDRITO", 
@@ -28,29 +31,38 @@ if not os.path.exists(DB_GASTOS):
     df_g_ini = pd.DataFrame(columns=["Fecha", "Concepto", "Categoría", "Importe (€)", "Pagado por"])
     df_g_ini.to_csv(DB_GASTOS, index=False)
 
-# Cargar datos actuales
+# Cargar datos actuales assegurando las columnas correctas
 df_cuotas = pd.read_csv(DB_CUOTAS)
+
+# Si el archivo viejo tenía otros nombres, se los machacamos con los nuevos para arreglar el error
+if len(df_cuotas.columns) >= 5:
+    df_cuotas.columns = COLUMNAS_CUOTAS[:len(df_cuotas.columns)]
+else:
+    # Si está muy corrupto, lo reiniciamos limpio
+    componentes = ["PEDRO JAVIER", "PEDRO ALEJANDRO", "PEDROLOSE", "PEDROJOSE", "PEDRITO", "PE", "JUANJE", "RAFA", "SEBA", "FALU", "CONDE", "FRAN", "JUAN CARLOS", "VICTOR"]
+    df_cuotas = pd.DataFrame({"Componente": componentes, "Bote Bebida (10€)": ["Pagado"] * 14, "Noviembre (50€)": ["Pendiente"] * 14, "Diciembre (50€)": ["Pendiente"] * 14, "Enero (50€)": ["Pendiente"] * 14})
+
 df_gastos = pd.read_csv(DB_GASTOS)
 
-# --- CÁLCULOS DE RECAUDACIÓN Y BALANCES ---
+# --- CÁLCULOS UTILIZANDO POSICIONES (ÍNDICES) PARA EVITAR KEYERROR ---
 def calcular_total_pagado(row):
     total = 0
-    if row["Bote Bebida (10€)"] == "Pagado": total += 10
-    if row["Noviembre (50€)"] == "Pagado": total += 50
-    if row["Diciembre (50€)"] == "Pagado": total += 50
-    if row["Enero (50€)"] == "Pagado": total += 50
+    if row.iloc[1] == "Pagado": total += 10  # Columna 2: Bote
+    if row.iloc[2] == "Pagado": total += 50  # Columna 3: Noviembre
+    if row.iloc[3] == "Pagado": total += 50  # Columna 4: Diciembre
+    if row.iloc[4] == "Pagado": total += 50  # Columna 5: Enero
     return total
 
 df_cuotas["Total Pagado (€)"] = df_cuotas.apply(calcular_total_pagado, axis=1)
 df_cuotas["Total Pendiente (€)"] = 160 - df_cuotas["Total Pagado (€)"]
 
 # Fondos totales recaudados por tipo
-total_recaudado_bebida = (df_cuotas["Bote Bebida (10€)"] == "Pagado").sum() * 10
+total_recaudado_bebida = (df_cuotas.iloc[:, 1] == "Pagado").sum() * 10
 total_recaudado_cuotas = df_cuotas["Total Pagado (€)"].sum() - total_recaudado_bebida
 
 # Filtrar gastos por tipo
-gastos_bebida = df_gastos[df_gastos["Categoría"] == "Bebida / Barra"]["Importe (€)"].sum()
-gastos_generales = df_gastos[df_gastos["Categoría"] != "Bebida / Barra"]["Importe (€)"].sum()
+gastos_bebida = df_gastos[df_gastos["Categoría"] == "Bebida / Barra"]["Importe (€)"].sum() if not df_gastos.empty else 0
+gastos_generales = df_gastos[df_gastos["Categoría"] != "Bebida / Barra"]["Importe (€)"].sum() if not df_gastos.empty else 0
 
 saldo_barra = total_recaudado_bebida - gastos_bebida
 saldo_general = total_recaudado_cuotas - gastos_generales
@@ -61,7 +73,7 @@ st.markdown("<h1 style='text-align: center; color: #FF4B4B; font-family: sans-se
 st.markdown("<p style='text-align: center; font-size: 18px; font-family: sans-serif;'>Sistema de Gestión Financiera: Cuotas, Consumos y Materiales</p>", unsafe_allow_html=True)
 st.write("---")
 
-# Tarjetas de dinero en la barra superior
+# Tarjetas de dinero arriba
 col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(label="💰 Saldo Total en Caja", value=f"{saldo_total_caja:,.2f} €")
@@ -132,11 +144,11 @@ with tab3:
     for _, r in df_cuotas.iterrows():
         tabla_html += f"""
         <tr>
-            <td style='padding: 8px; border: 1px solid #ddd;'>{r['Componente']}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r['Bote Bebida (10€)']}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r['Noviembre (50€)']}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r['Diciembre (50€)']}</td>
-            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r['Enero (50€)']}</td>
+            <td style='padding: 8px; border: 1px solid #ddd;'>{r.iloc[0]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r.iloc[1]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r.iloc[2]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r.iloc[3]}</td>
+            <td style='padding: 8px; border: 1px solid #ddd; text-align: center;'>{r.iloc[4]}</td>
             <td style='padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold;'>{r['Total Pagado (€)']}€</td>
         </tr>
         """
