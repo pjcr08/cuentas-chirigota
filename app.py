@@ -218,7 +218,7 @@ with tab1:
         pdf.add_page()
         pdf.set_font("helvetica", "B", 14)
         pdf.cell(
-            0, 10, 'CHIRIGOTA "LA PALETA" - ACTA FINANCIERA', 0, 1, "C"
+            0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C"
         )
 
         pdf.set_font("helvetica", "", 9)
@@ -277,18 +277,21 @@ with tab1:
         pdf.set_text_color(0, 0, 0)
         if not df_gastos.empty:
             for _, g in df_gastos.iterrows():
-                # Fondo de color diferenciado en el PDF según tipo (Verde para Ingresos, Rojo para Gastos)
-                if str(g["Tipo (Ingreso/Gasto)"]) == "Ingreso":
+                tipo_val = str(g["Tipo (Ingreso/Gasto)"])
+                cell_fill = False
+                if tipo_val == "Ingreso":
                     pdf.set_fill_color(220, 245, 220)  # Verde suave
-                else:
+                    cell_fill = True
+                elif tipo_val == "Gasto":
                     pdf.set_fill_color(255, 225, 225)  # Rojo suave
+                    cell_fill = True
 
-                pdf.cell(22, 6, str(g["Fecha"]), 1, 0, "C", True)
-                pdf.cell(20, 6, str(g["Tipo (Ingreso/Gasto)"]), 1, 0, "C", True)
-                pdf.cell(66, 6, str(g["Concepto"]), 1, 0, "L", True)
-                pdf.cell(38, 6, str(g["Categoría"]), 1, 0, "L", True)
-                pdf.cell(22, 6, f"{g['Importe (€)']} EUR", 1, 0, "R", True)
-                pdf.cell(24, 6, str(g["Responsable"]), 1, 1, "C", True)
+                pdf.cell(22, 6, str(g["Fecha"]) if pd.notna(g["Fecha"]) else "", 1, 0, "C", cell_fill)
+                pdf.cell(20, 6, tipo_val if tipo_val != "nan" else "", 1, 0, "C", cell_fill)
+                pdf.cell(66, 6, str(g["Concepto"]) if pd.notna(g["Concepto"]) else "", 1, 0, "L", cell_fill)
+                pdf.cell(38, 6, str(g["Categoría"]) if pd.notna(g["Categoría"]) else "", 1, 0, "L", cell_fill)
+                pdf.cell(22, 6, f"{g['Importe (€)']} EUR" if pd.notna(g['Importe (€)']) else "", 1, 0, "R", cell_fill)
+                pdf.cell(24, 6, str(g["Responsable"]) if pd.notna(g["Responsable"]) else "", 1, 1, "C", cell_fill)
         else:
             pdf.cell(192, 6, "No hay movimientos registrados.", 1, 1, "C")
 
@@ -419,12 +422,13 @@ with tab2:
 
     st.write("### 📜 Historial de Apuntes de Caja")
     if not df_gastos.empty:
-        # --- FUNCIÓN PARA COLOREAR LA TABLA EN PANTALLA (Verde ingresos, Rojo gastos) ---
         def colorear_filas(row):
-            if row["Tipo (Ingreso/Gasto)"] == "Ingreso":
+            tipo = str(row.get("Tipo (Ingreso/Gasto)", ""))
+            if tipo == "Ingreso":
                 return ["background-color: #d4edda; color: #155724"] * len(row)
-            else:
+            elif tipo == "Gasto":
                 return ["background-color: #f8d7da; color: #721c24"] * len(row)
+            return [""] * len(row)
 
         if es_director:
             st.caption(
@@ -443,7 +447,6 @@ with tab2:
                 st.success("¡Historial de caja actualizado correctamente!")
                 st.rerun()
         else:
-            # Muestra la tabla estilizada con colores en modo lectura
             st.dataframe(
                 df_gastos.style.apply(colorear_filas, axis=1),
                 use_container_width=True,
