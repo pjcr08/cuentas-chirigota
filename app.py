@@ -198,13 +198,13 @@ st.write("---")
 tab1, tab2 = st.tabs([
     "📋 Cuadro de Componentes y Cuotas",
     "💸 Registro de Gastos e Ingresos",
-] )
+])
 
 with tab1:
   st.subheader("📊 Estado de Pagos de la Agrupación")
 
 
-  # --- FUNCIÓN PARA GENERAR EL PDF PROFESIONAL ---
+  # --- FUNCIÓN PARA GENERAR EL PDF SIN ERRORES DE CODIFICACIÓN ---
   def generar_pdf():
     pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
@@ -217,16 +217,16 @@ with tab1:
     pdf.cell(
         0,
         6,
-        f"Saldo Total en Caja: {saldo_total_caja:,.2f} €  |  Bote Bebida:"
-        f" {total_recaudado_bebida:,.2f} €  |  Cuotas:"
-        f" {total_recaudado_cuotas:,.2f} €",
+        f"Saldo Total en Caja: {saldo_total_caja:,.2f} EUR  |  Bote Bebida:"
+        f" {total_recaudado_bebida:,.2f} EUR  |  Cuotas:"
+        f" {total_recaudado_cuotas:,.2f} EUR",
         0,
         1,
         "C",
     )
     pdf.ln(4)
 
-    # Tabla de Cuotas (con Total Pagado y Pendiente)
+    # Tabla de Cuotas
     pdf.set_font("helvetica", "B", 8)
     pdf.set_fill_color(168, 50, 121)
     pdf.set_text_color(255, 255, 255)
