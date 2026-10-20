@@ -226,16 +226,17 @@ with tab1:
         pdf = FPDF(orientation="P", unit="mm", format="A4")
         pdf.add_page()
         
-        # Añadir logo en el PDF si existe
+        # Logo mejorado y de mayor tamaño en el PDF
         if os.path.exists(LOGO_PATH):
-            pdf.image(LOGO_PATH, x=15, y=10, w=22)
-            pdf.set_xy(40, 15)
+            pdf.image(LOGO_PATH, x=15, y=8, w=35)
+            pdf.set_xy(55, 12)
         else:
-            pdf.set_xy(10, 15)
+            pdf.set_xy(10, 12)
 
-        pdf.set_font("helvetica", "B", 14)
-        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
+        pdf.set_font("helvetica", "B", 15)
+        pdf.cell(0, 8, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
 
+        pdf.set_xy(10, 26)
         pdf.set_font("helvetica", "", 9)
         pdf.cell(
             0,
@@ -247,7 +248,7 @@ with tab1:
             1,
             "C",
         )
-        pdf.ln(6)
+        pdf.ln(4)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(168, 50, 121)
@@ -298,10 +299,10 @@ with tab1:
                 cell_fill = False
                 
                 if tipo_val == "Ingreso":
-                    pdf.set_fill_color(220, 245, 220)  # Verde
+                    pdf.set_fill_color(220, 245, 220)  # Verde suave
                     cell_fill = True
                 elif tipo_val == "Gasto":
-                    pdf.set_fill_color(255, 225, 225)  # Rojo
+                    pdf.set_fill_color(255, 225, 225)  # Rojo suave
                     cell_fill = True
 
                 pdf.cell(22, 6, str(g["Fecha"]) if pd.notna(g["Fecha"]) else "", 1, 0, "C", cell_fill)
