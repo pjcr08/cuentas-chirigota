@@ -1,12 +1,13 @@
 from io import BytesIO
 from fpdf import FPDF
+from datetime import datetime
 import os
 import pandas as pd
 import streamlit as st
 
 # Configuración de la página web optimizada para ordenador y móvil
 st.set_page_config(
-    page_title="Chirigota La Paleta 🎭",
+    page_title="Chirigota La Paleta 26/27 🎭",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -184,7 +185,7 @@ with col_titulo:
     st.markdown(
         """
         <div style='background: linear-gradient(135deg, #A83279, #D38312); padding: 20px; border-radius: 12px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);'>
-            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 1px; margin: 0;'>🎭 Chirigota: LA PALETA</h1>
+            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 1px; margin: 0;'>🎭 Chirigota: LA PALETA (26/27)</h1>
             <p style='color: #fff; font-size: 1rem; font-style: italic; margin: 0;'>Control financiero oficial</p>
         </div>""",
         unsafe_allow_html=True,
@@ -240,33 +241,37 @@ with tab1:
         
         pdf.set_font("helvetica", "B", 16)
         pdf.set_text_color(168, 50, 121)
-        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
+        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA" (26/27)', 0, 1, "C")
         
         pdf.set_font("helvetica", "I", 10)
         pdf.set_text_color(100, 100, 100)
         pdf.cell(0, 5, 'Resumen Financiero Oficial', 0, 1, "C")
+        
+        fecha_hora_actual = datetime.now().strftime("%d/%m/%Y a las %H:%M")
+        pdf.set_font("helvetica", "", 8)
+        pdf.cell(0, 5, f"Fecha de emisión: {fecha_hora_actual}", 0, 1, "C")
         
         pdf.ln(4)
         pdf.set_text_color(0, 0, 0)
 
         pdf.set_fill_color(245, 245, 245)
         pdf.set_font("helvetica", "B", 9)
-        pdf.cell(190, 7, f" Saldo Total: {saldo_total_caja:,.2f} EUR   |   Bote Bebida: {total_recaudado_bebida:,.2f} EUR   |   Cuotas: {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
+        pdf.cell(190, 7, f" Saldo Total: {saldo_total_caja:,.2f} EUR    |    Bote Bebida (10€): {total_recaudado_bebida:,.2f} EUR    |    Cuotas (50€/mes): {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
         pdf.ln(5)
 
         pdf.set_font("helvetica", "B", 10)
         pdf.set_text_color(50, 50, 50)
-        pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES", 0, 1, "L")
+        pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES (Bote: 10€ | Cuotas Mensuales: 50€)", 0, 1, "L")
         pdf.ln(2)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(168, 50, 121)
         pdf.set_text_color(255, 255, 255)
         pdf.cell(45, 6, "Componente", 1, 0, "C", True)
-        pdf.cell(22, 6, "Bote", 1, 0, "C", True)
-        pdf.cell(22, 6, "Nov.", 1, 0, "C", True)
-        pdf.cell(22, 6, "Dic.", 1, 0, "C", True)
-        pdf.cell(22, 6, "Enero", 1, 0, "C", True)
+        pdf.cell(22, 6, "Bote (10€)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Nov. (50€)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Dic. (50€)", 1, 0, "C", True)
+        pdf.cell(22, 6, "Enero (50€)", 1, 0, "C", True)
         pdf.cell(26, 6, "Tot. Pag.", 1, 0, "C", True)
         pdf.cell(26, 6, "Tot. Pend.", 1, 1, "C", True)
 
@@ -279,9 +284,9 @@ with tab1:
             for col_idx in range(1, 5):
                 val = str(r.iloc[col_idx])
                 if val == "Pagado":
-                    pdf.set_fill_color(220, 245, 220)  # Verde suave
+                    pdf.set_fill_color(220, 245, 220)
                 elif val == "Pendiente":
-                    pdf.set_fill_color(255, 243, 205)  # Amarillo suave
+                    pdf.set_fill_color(255, 243, 205)
                 else:
                     pdf.set_fill_color(255, 255, 255)
                 pdf.cell(22, 6, val, 1, 0, "C", True)
@@ -335,7 +340,7 @@ with tab1:
     st.download_button(
         label="📥 Descargar Acta en PDF",
         data=pdf_bytes,
-        file_name="acta_cuotas_y_gastos_la_paleta.pdf",
+        file_name="acta_cuotas_y_gastos_la_paleta_26_27.pdf",
         mime="application/pdf",
         type="primary",
     )
