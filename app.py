@@ -277,12 +277,18 @@ with tab1:
     pdf.set_text_color(0, 0, 0)
     if not df_gastos.empty:
       for _, g in df_gastos.iterrows():
-        pdf.cell(22, 6, str(g["Fecha"]), 1, 0, "C")
-        pdf.cell(20, 6, str(g["Tipo (Ingreso/Gasto)"]), 1, 0, "C")
-        pdf.cell(66, 6, str(g["Concepto"]), 1, 0, "L")
-        pdf.cell(38, 6, str(g["Categoría"]), 1, 0, "L")
-        pdf.cell(22, 6, f"{g['Importe (€)']} EUR", 1, 0, "R")
-        pdf.cell(24, 6, str(g["Responsable"]), 1, 1, "C")
+        # Fondo de color diferenciado en el PDF según tipo
+        if str(g["Tipo (Ingreso/Gasto)"]) == "Ingreso":
+          pdf.set_fill_color(220, 245, 220)  # Verde suave
+        else:
+          pdf.set_fill_color(255, 225, 225)  # Rojo suave
+
+        pdf.cell(22, 6, str(g["Fecha"]), 1, 0, "C", True)
+        pdf.cell(20, 6, str(g["Tipo (Ingreso/Gasto)"]), 1, 0, "C", True)
+        pdf.cell(66, 6, str(g["Concepto"]), 1, 0, "L", True)
+        pdf.cell(38, 6, str(g["Categoría"]), 1, 0, "L", True)
+        pdf.cell(22, 6, f"{g['Importe (€)']} EUR", 1, 0, "R", True)
+        pdf.cell(24, 6, str(g["Responsable"]), 1, 1, "C", True)
     else:
       pdf.cell(192, 6, "No hay movimientos registrados.", 1, 1, "C")
 
@@ -372,23 +378,24 @@ with tab2:
                 "🎭 Telones y Forillo",
                 "🧵 Telas y Disfraces",
                 "🎸 Instrumentos / Pitos",
-                "💰 Subvención / Venta",
+                "💰 Subvención / Venta / Años Anteriores",
                 "📦 Varios",
             ],
         )
 
       c4, c5, c6 = st.columns(3)
       with c4:
-        concepto = st.text_input("Concepto (Ej: Caja de cervezas, Alquiler...)")
+        concepto = st.text_input("Concepto (Ej: Remanente año pasado...)")
       with c5:
         importe = st.number_input(
             "Importe (€)", min_value=0.0, step=1.0, format="%.2f"
         )
       with c6:
-        responsable = st.selectbox(
-            "Responsable / Pagador",
-            ["Bote Común"] + list(df_cuotas["Componente"]),
-        )
+        opciones_responsable = [
+            "Bote Común",
+            "Caja Años Anteriores (Chirigota)",
+        ] + list(df_cuotas["Componente"])
+        responsable = st.selectbox("Responsable / Pagador", opciones_responsable)
 
       submit_mov = st.form_submit_button(
           "➕ Registrar en el Libro de Caja", type="primary"
@@ -412,6 +419,16 @@ with tab2:
 
   st.write("### 📜 Historial de Apuntes de Caja")
   if not df_gastos.empty:
+
+
+    # --- FUNCIÓN PARA COLOREAR LA TABLA EN PANTALLA ---
+    def colorear_filas(row):
+      if row["Tipo (Ingreso/Gasto)"] == "Ingreso":
+        return ["background-color: #d4edda; color: #155724"] * len(row)
+      else:
+        return ["background-color: #f8d7da; color: #721c24"] * len(row)
+
+
     if es_director:
       st.caption(
           "💡 Puedes borrar filas seleccionándolas y pulsando la papelera o"
@@ -429,6 +446,11 @@ with tab2:
         st.success("¡Historial de caja actualizado correctamente!")
         st.rerun()
     else:
-      st.dataframe(df_gastos, use_container_width=True, hide_index=True)
+      # Muestra la tabla estilizada con colores en modo lectura
+      st.dataframe(
+          df_gastos.style.apply(colorear_filas, axis=1),
+          use_container_width=True,
+          hide_index=True,
+      )
   else:
     st.info("Todavía no hay movimientos registrados.")
