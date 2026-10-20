@@ -246,11 +246,11 @@ with tab1:
         
         pdf.set_font("helvetica", "B", 15)
         pdf.set_text_color(168, 50, 121)
-        pdf.cell(0, 8, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
+        pdf.cell(0, 8, 'CHIRIGOTA LA PALETA 26/27', 0, 1, "C")
         
         pdf.set_font("helvetica", "I", 9)
         pdf.set_text_color(100, 100, 100)
-        pdf.cell(0, 5, 'Resumen Financiero Oficial', 0, 1, "C")
+        pdf.cell(0, 5, 'Resumen', 0, 1, "C")
         
         pdf.ln(4)
         pdf.set_text_color(0, 0, 0)
