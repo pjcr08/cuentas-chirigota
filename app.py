@@ -4,24 +4,18 @@ import os
 import pandas as pd
 import streamlit as st
 
-# Configuración de la página web optimizada para móviles y escritorio
+# Configuración de la página web optimizada para ordenador y móvil
 st.set_page_config(
     page_title="Chirigota La Paleta 🎭",
     layout="wide",
-    initial_sidebar_state="collapsed",
+    initial_sidebar_state="expanded",
 )
 
-# --- ESTILOS CSS ADAPTATIVOS PARA MÓVIL ---
+# --- ESTILOS CSS ADAPTATIVOS ---
 st.markdown(
     """
     <style>
-    @media (max-width: 768px) {
-        h1 { font-size: 1.4rem !important; }
-        h2 { font-size: 1.1rem !important; }
-        h3 { font-size: 0.95rem !important; }
-        .stButton button, .stDownloadButton button { width: 100% !important; }
-    }
-    .block-container { padding-top: 1.2rem; padding-bottom: 2rem; }
+    .block-container { padding-top: 1.5rem; padding-bottom: 2rem; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -181,17 +175,17 @@ saldo_total_caja = (
     - total_gastos
 )
 
-# --- CABECERA VISUAL CON LOGO MEJORADO ---
-col_logo, col_titulo = st.columns([1, 4])
+# --- CABECERA VISUAL CON LOGO ---
+col_logo, col_titulo = st.columns([1, 5])
 with col_logo:
     if os.path.exists(LOGO_PATH):
-        st.image(LOGO_PATH, width=110)
+        st.image(LOGO_PATH, width=130)
 with col_titulo:
     st.markdown(
         """
-        <div style='background: linear-gradient(135deg, #A83279, #D38312); padding: 15px; border-radius: 12px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);'>
-            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 1px; margin: 0; font-size: 1.4rem;'>🎭 Chirigota: LA PALETA</h1>
-            <p style='color: #fff; font-size: 0.85rem; font-style: italic; margin: 0;'>Control financiero oficial</p>
+        <div style='background: linear-gradient(135deg, #A83279, #D38312); padding: 20px; border-radius: 12px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);'>
+            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 1px; margin: 0;'>🎭 Chirigota: LA PALETA</h1>
+            <p style='color: #fff; font-size: 1rem; font-style: italic; margin: 0;'>Control financiero oficial</p>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -202,28 +196,28 @@ st.write("")
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
-        f" 8px; border-left: 4px solid #FFD700; text-align: center;'><p"
-        f" style='margin:0; color:#aaa; font-size:0.75rem;'>💰 Caja Total</p><h4"
-        f" style='margin:0; color:#FFD700; font-size:1rem;'>{saldo_total_caja:,.2f} €</h4></div>",
+        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
+        f" 10px; border-left: 5px solid #FFD700; text-align: center;'><p"
+        f" style='margin:0; color:#aaa;'>💰 Caja Total</p><h3"
+        f" style='margin:0; color:#FFD700;'>{saldo_total_caja:,.2f} €</h3></div>",
         unsafe_allow_html=True,
     )
 with col2:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
-        f" 8px; border-left: 4px solid #4CAF50; text-align: center;'><p"
-        f" style='margin:0; color:#aaa; font-size:0.75rem;'>🍺 Bote Bebida</p><h4"
-        f" style='margin:0; color:#4CAF50; font-size:1rem;'>{total_recaudado_bebida:,.2f}"
-        " €</h4></div>",
+        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
+        f" 10px; border-left: 5px solid #4CAF50; text-align: center;'><p"
+        f" style='margin:0; color:#aaa;'>🍺 Bote Bebida</p><h3"
+        f" style='margin:0; color:#4CAF50;'>{total_recaudado_bebida:,.2f}"
+        " €</h3></div>",
         unsafe_allow_html=True,
     )
 with col3:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
-        f" 8px; border-left: 4px solid #2196F3; text-align: center;'><p"
-        f" style='margin:0; color:#aaa; font-size:0.75rem;'>🧵 Cuotas</p><h4"
-        f" style='margin:0; color:#2196F3; font-size:1rem;'>{total_recaudado_cuotas:,.2f}"
-        " €</h4></div>",
+        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
+        f" 10px; border-left: 5px solid #2196F3; text-align: center;'><p"
+        f" style='margin:0; color:#aaa;'>🧵 Cuotas</p><h3"
+        f" style='margin:0; color:#2196F3;'>{total_recaudado_cuotas:,.2f}"
+        " €</h3></div>",
         unsafe_allow_html=True,
     )
 
@@ -242,15 +236,15 @@ with tab1:
         pdf.add_page()
         
         if os.path.exists(LOGO_PATH):
-            pdf.image(LOGO_PATH, x=15, y=10, w=25)
+            pdf.image(LOGO_PATH, x=15, y=10, w=28)
         
-        pdf.set_font("helvetica", "B", 15)
+        pdf.set_font("helvetica", "B", 16)
         pdf.set_text_color(168, 50, 121)
-        pdf.cell(0, 8, 'CHIRIGOTA LA PALETA 26/27', 0, 1, "C")
+        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
         
-        pdf.set_font("helvetica", "I", 9)
+        pdf.set_font("helvetica", "I", 10)
         pdf.set_text_color(100, 100, 100)
-        pdf.cell(0, 5, 'Resumen', 0, 1, "C")
+        pdf.cell(0, 5, 'Resumen Financiero Oficial', 0, 1, "C")
         
         pdf.ln(4)
         pdf.set_text_color(0, 0, 0)
@@ -282,7 +276,6 @@ with tab1:
         for _, r in df_cuotas.iterrows():
             pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L")
             
-            # Celdas con color condicional (Verde si Pagado, Amarillo si Pendiente)
             for col_idx in range(1, 5):
                 val = str(r.iloc[col_idx])
                 if val == "Pagado":
@@ -350,7 +343,6 @@ with tab1:
     if not es_director:
         st.warning("⚠️ Modo lectura. Introduce la contraseña lateral para editar.")
 
-    # --- FUNCIÓN DE ESTILO PARA LAS CUOTAS EN PANTALLA ---
     def colorear_cuotas(val):
         if val == "Pagado":
             return "background-color: #d4edda; color: #155724; font-weight: bold;"
@@ -376,7 +368,7 @@ with tab1:
                 use_container_width=True,
                 hide_index=True,
                 num_rows="dynamic",
-                height=450,
+                height=500,
             )
             if st.button("💾 Guardar Cambios Cuotas", type="secondary"):
                 save_df = edited_df.drop(columns=["Total Pagado (€)", "Total Pendiente (€)"])
