@@ -4,11 +4,41 @@ import os
 import pandas as pd
 import streamlit as st
 
-# Configuración de la página web con estilo carnavalero
+# Configuración de la página web optimizada para móviles y escritorio
 st.set_page_config(
     page_title="Chirigota La Paleta 🎭",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed", # Contraído por defecto en móvil para ganar espacio
+)
+
+# --- ESTILOS CSS ADAPTATIVOS PARA MÓVIL ---
+st.markdown(
+    """
+    <style>
+    /* Ajustes generales para pantallas pequeñas */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 1.5rem !important;
+        }
+        h2 {
+            font-size: 1.2rem !important;
+        }
+        h3 {
+            font-size: 1rem !important;
+        }
+        /* Botones e inputs a ancho completo en móvil para facilitar el toque */
+        .stButton button, .stDownloadButton button {
+            width: 100% !important;
+        }
+    }
+    /* Estética general de contenedores */
+    .block-container {
+        padding-top: 1.5rem;
+        padding-bottom: 2rem;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 # --- BASE DE DATOS LOCAL ---
@@ -105,7 +135,7 @@ if "Tipo (Ingreso/Gasto)" not in df_gastos.columns:
 df_gastos.dropna(how="all", inplace=True)
 
 # --- CONTROL DE ACCESO ---
-st.sidebar.markdown("## 🔐 Llave del Local (Control)")
+st.sidebar.markdown("## 🔐 Llave del Local")
 if os.path.exists(LOGO_PATH):
     st.sidebar.image(LOGO_PATH, use_column_width=True)
 
@@ -166,17 +196,17 @@ saldo_total_caja = (
     - total_gastos
 )
 
-# --- CABECERA VISUAL CON LOGO ---
+# --- CABECERA VISUAL ADAPTATIVA ---
 col_logo, col_titulo = st.columns([1, 4])
 with col_logo:
     if os.path.exists(LOGO_PATH):
-        st.image(LOGO_PATH, width=130)
+        st.image(LOGO_PATH, width=110)
 with col_titulo:
     st.markdown(
         """
-        <div style='background: linear-gradient(135deg, #A83279, #D38312); padding: 18px; border-radius: 15px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);'>
-            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 2px; margin: 0;'>🎭 Chirigota: LA PALETA 🎭</h1>
-            <p style='color: #fff; font-size: 16px; font-style: italic; margin: 0;'>Control financiero oficial para el Concurso</p>
+        <div style='background: linear-gradient(135deg, #A83279, #D38312); padding: 15px; border-radius: 12px; box-shadow: 0px 4px 10px rgba(0,0,0,0.3);'>
+            <h1 style='color: white; font-family: "Impact", sans-serif; letter-spacing: 1px; margin: 0; font-size: 1.4rem;'>🎭 Chirigota: LA PALETA</h1>
+            <p style='color: #fff; font-size: 0.85rem; font-style: italic; margin: 0;'>Control financiero oficial</p>
         </div>""",
         unsafe_allow_html=True,
     )
@@ -187,68 +217,68 @@ st.write("")
 col1, col2, col3 = st.columns(3)
 with col1:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
-        f" 10px; border-left: 5px solid #FFD700; text-align: center;'><h5"
-        f" style='margin:0; color:#aaa;'>💰 Caja Total Actual</h5><h2"
-        f" style='margin:0; color:#FFD700;'>{saldo_total_caja:,.2f} €</h2></div>",
+        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
+        f" 8px; border-left: 4px solid #FFD700; text-align: center;'><p"
+        f" style='margin:0; color:#aaa; font-size:0.75rem;'>💰 Caja Total</p><h4"
+        f" style='margin:0; color:#FFD700; font-size:1rem;'>{saldo_total_caja:,.2f} €</h4></div>",
         unsafe_allow_html=True,
     )
 with col2:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
-        f" 10px; border-left: 5px solid #4CAF50; text-align: center;'><h5"
-        f" style='margin:0; color:#aaa;'>🍺 Bote de Bebida</h5><h2"
-        f" style='margin:0; color:#4CAF50;'>{total_recaudado_bebida:,.2f}"
-        " €</h2></div>",
+        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
+        f" 8px; border-left: 4px solid #4CAF50; text-align: center;'><p"
+        f" style='margin:0; color:#aaa; font-size:0.75rem;'>🍺 Bote Bebida</p><h4"
+        f" style='margin:0; color:#4CAF50; font-size:1rem;'>{total_recaudado_bebida:,.2f}"
+        " €</h4></div>",
         unsafe_allow_html=True,
     )
 with col3:
     st.markdown(
-        f"<div style='background-color: #2b2b2b; padding: 15px; border-radius:"
-        f" 10px; border-left: 5px solid #2196F3; text-align: center;'><h5"
-        f" style='margin:0; color:#aaa;'>🧵 Cuotas Recaudadas</h5><h2"
-        f" style='margin:0; color:#2196F3;'>{total_recaudado_cuotas:,.2f}"
-        " €</h2></div>",
+        f"<div style='background-color: #2b2b2b; padding: 10px; border-radius:"
+        f" 8px; border-left: 4px solid #2196F3; text-align: center;'><p"
+        f" style='margin:0; color:#aaa; font-size:0.75rem;'>🧵 Cuotas</p><h4"
+        f" style='margin:0; color:#2196F3; font-size:1rem;'>{total_recaudado_cuotas:,.2f}"
+        " €</h4></div>",
         unsafe_allow_html=True,
     )
 
 st.write("---")
 
 tab1, tab2 = st.tabs([
-    "📋 Cuadro de Componentes y Cuotas",
-    "💸 Registro de Gastos e Ingresos",
+    "📋 Cuotas",
+    "💸 Caja",
 ])
 
 with tab1:
-    st.subheader("📊 Estado de Pagos de la Agrupación")
+    st.subheader("📊 Estado de Pagos")
 
     def generar_pdf():
         pdf = FPDF(orientation="P", unit="mm", format="A4")
         pdf.add_page()
         
-        # Logo mejorado y de mayor tamaño en el PDF
         if os.path.exists(LOGO_PATH):
-            pdf.image(LOGO_PATH, x=15, y=8, w=35)
-            pdf.set_xy(55, 12)
-        else:
-            pdf.set_xy(10, 12)
-
-        pdf.set_font("helvetica", "B", 15)
-        pdf.cell(0, 8, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
-
-        pdf.set_xy(10, 26)
-        pdf.set_font("helvetica", "", 9)
-        pdf.cell(
-            0,
-            6,
-            f"Saldo Total en Caja: {saldo_total_caja:,.2f} EUR  |  Bote Bebida:"
-            f" {total_recaudado_bebida:,.2f} EUR  |  Cuotas:"
-            f" {total_recaudado_cuotas:,.2f} EUR",
-            0,
-            1,
-            "C",
-        )
+            pdf.image(LOGO_PATH, x=15, y=10, w=28)
+        
+        pdf.set_font("helvetica", "B", 16)
+        pdf.set_text_color(168, 50, 121)
+        pdf.cell(0, 10, 'CHIRIGOTA "LA PALETA"', 0, 1, "C")
+        
+        pdf.set_font("helvetica", "I", 10)
+        pdf.set_text_color(100, 100, 100)
+        pdf.cell(0, 5, 'Resumen Financiero Oficial', 0, 1, "C")
+        
         pdf.ln(4)
+        pdf.set_text_color(0, 0, 0)
+
+        pdf.set_fill_color(245, 245, 245)
+        pdf.set_font("helvetica", "B", 9)
+        pdf.cell(190, 8, f" Saldo Total: {saldo_total_caja:,.2f} EUR   |   Bote Bebida: {total_recaudado_bebida:,.2f} EUR   |   Cuotas: {total_recaudado_cuotas:,.2f} EUR", 1, 1, "C", True)
+        pdf.ln(6)
+
+        pdf.set_font("helvetica", "B", 11)
+        pdf.set_text_color(50, 50, 50)
+        pdf.cell(0, 6, "ESTADO DE PAGOS DE COMPONENTES", 0, 1, "L")
+        pdf.ln(2)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(168, 50, 121)
@@ -263,29 +293,36 @@ with tab1:
 
         pdf.set_font("helvetica", "", 8)
         pdf.set_text_color(0, 0, 0)
-        for _, r in df_cuotas.iterrows():
-            pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L")
-            pdf.cell(22, 6, str(r.iloc[1]), 1, 0, "C")
-            pdf.cell(22, 6, str(r.iloc[2]), 1, 0, "C")
-            pdf.cell(22, 6, str(r.iloc[3]), 1, 0, "C")
-            pdf.cell(22, 6, str(r.iloc[4]), 1, 0, "C")
-            pdf.cell(26, 6, f"{r['Total Pagado (€)']} EUR", 1, 0, "C")
-            pdf.cell(26, 6, f"{r['Total Pendiente (€)']} EUR", 1, 1, "C")
+        for i, r in df_cuotas.iterrows():
+            if i % 2 == 0:
+                pdf.set_fill_color(255, 255, 255)
+            else:
+                pdf.set_fill_color(250, 250, 250)
+                
+            pdf.cell(45, 6, str(r.iloc[0]), 1, 0, "L", True)
+            pdf.cell(22, 6, str(r.iloc[1]), 1, 0, "C", True)
+            pdf.cell(22, 6, str(r.iloc[2]), 1, 0, "C", True)
+            pdf.cell(22, 6, str(r.iloc[3]), 1, 0, "C", True)
+            pdf.cell(22, 6, str(r.iloc[4]), 1, 0, "C", True)
+            pdf.cell(26, 6, f"{r['Total Pagado (€)']} EUR", 1, 0, "C", True)
+            pdf.cell(26, 6, f"{r['Total Pendiente (€)']} EUR", 1, 1, "C", True)
 
-        pdf.ln(6)
+        pdf.ln(8)
 
-        pdf.set_font("helvetica", "B", 10)
-        pdf.cell(0, 7, "REGISTRO DE MOVIMIENTOS (GASTOS E INGRESOS)", 0, 1, "L")
+        pdf.set_font("helvetica", "B", 11)
+        pdf.set_text_color(50, 50, 50)
+        pdf.cell(0, 6, "REGISTRO DE MOVIMIENTOS (GASTOS E INGRESOS)", 0, 1, "L")
+        pdf.ln(2)
 
         pdf.set_font("helvetica", "B", 8)
         pdf.set_fill_color(50, 50, 50)
         pdf.set_text_color(255, 255, 255)
-        pdf.cell(22, 6, "Fecha", 1, 0, "C", True)
-        pdf.cell(20, 6, "Tipo", 1, 0, "C", True)
-        pdf.cell(66, 6, "Concepto", 1, 0, "C", True)
-        pdf.cell(38, 6, "Categoría", 1, 0, "C", True)
-        pdf.cell(22, 6, "Importe", 1, 0, "C", True)
-        pdf.cell(24, 6, "Resp.", 1, 1, "C", True)
+        pdf.cell(22, 7, "Fecha", 1, 0, "C", True)
+        pdf.cell(20, 7, "Tipo", 1, 0, "C", True)
+        pdf.cell(66, 7, "Concepto", 1, 0, "C", True)
+        pdf.cell(38, 7, "Categoría", 1, 0, "C", True)
+        pdf.cell(22, 7, "Importe", 1, 0, "C", True)
+        pdf.cell(22, 7, "Resp.", 1, 1, "C", True)
 
         pdf.set_font("helvetica", "", 8)
         pdf.set_text_color(0, 0, 0)
@@ -296,29 +333,26 @@ with tab1:
         if not movs_validos.empty:
             for _, g in movs_validos.iterrows():
                 tipo_val = str(g["Tipo (Ingreso/Gasto)"]).strip()
-                cell_fill = False
-                
                 if tipo_val == "Ingreso":
-                    pdf.set_fill_color(220, 245, 220)  # Verde suave
-                    cell_fill = True
-                elif tipo_val == "Gasto":
-                    pdf.set_fill_color(255, 225, 225)  # Rojo suave
-                    cell_fill = True
+                    pdf.set_fill_color(220, 245, 220)
+                else:
+                    pdf.set_fill_color(255, 225, 225)
 
-                pdf.cell(22, 6, str(g["Fecha"]) if pd.notna(g["Fecha"]) else "", 1, 0, "C", cell_fill)
-                pdf.cell(20, 6, tipo_val, 1, 0, "C", cell_fill)
-                pdf.cell(66, 6, str(g["Concepto"]) if pd.notna(g["Concepto"]) else "", 1, 0, "L", cell_fill)
-                pdf.cell(38, 6, str(g["Categoría"]) if pd.notna(g["Categoría"]) else "", 1, 0, "L", cell_fill)
-                pdf.cell(22, 6, f"{g['Importe (€)']:.2f} EUR", 1, 0, "R", cell_fill)
-                pdf.cell(24, 6, str(g["Responsable"]) if pd.notna(g["Responsable"]) else "", 1, 1, "C", cell_fill)
+                pdf.cell(22, 6, str(g["Fecha"]) if pd.notna(g["Fecha"]) else "", 1, 0, "C", True)
+                pdf.cell(20, 6, tipo_val, 1, 0, "C", True)
+                pdf.cell(66, 6, str(g["Concepto"]) if pd.notna(g["Concepto"]) else "", 1, 0, "L", True)
+                pdf.cell(38, 6, str(g["Categoría"]) if pd.notna(g["Categoría"]) else "", 1, 0, "L", True)
+                pdf.cell(22, 6, f"{g['Importe (€)']:.2f} EUR", 1, 0, "R", True)
+                pdf.cell(22, 6, str(g["Responsable"]) if pd.notna(g["Responsable"]) else "", 1, 1, "C", True)
         else:
-            pdf.cell(192, 6, "No hay movimientos registrados.", 1, 1, "C")
+            pdf.set_fill_color(255, 255, 255)
+            pdf.cell(190, 6, "No hay movimientos registrados.", 1, 1, "C", True)
 
         return bytes(pdf.output())
 
     pdf_bytes = generar_pdf()
     st.download_button(
-        label="📥 Descargar Acta Completa en PDF",
+        label="📥 Descargar Acta en PDF",
         data=pdf_bytes,
         file_name="acta_cuotas_y_gastos_la_paleta.pdf",
         mime="application/pdf",
@@ -326,33 +360,16 @@ with tab1:
     )
 
     if not es_director:
-        st.warning(
-            "⚠️ Modo lectura. Introduce la contraseña en la barra lateral para"
-            " editar cuotas o añadir componentes."
-        )
+        st.warning("⚠️ Modo lectura. Introduce la contraseña lateral para editar.")
 
     column_config = {
-        "Componente": st.column_config.TextColumn(
-            "Componente", disabled=not es_director
-        ),
-        "Bote Bebida (10€)": st.column_config.SelectboxColumn(
-            options=["Pagado", "Pendiente"], disabled=not es_director
-        ),
-        "Noviembre (50€)": st.column_config.SelectboxColumn(
-            options=["Pagado", "Pendiente"], disabled=not es_director
-        ),
-        "Diciembre (50€)": st.column_config.SelectboxColumn(
-            options=["Pagado", "Pendiente"], disabled=not es_director
-        ),
-        "Enero (50€)": st.column_config.SelectboxColumn(
-            options=["Pagado", "Pendiente"], disabled=not es_director
-        ),
-        "Total Pagado (€)": st.column_config.NumberColumn(
-            format="%d €", disabled=True
-        ),
-        "Total Pendiente (€)": st.column_config.NumberColumn(
-            format="%d €", disabled=True
-        ),
+        "Componente": st.column_config.TextColumn("Componente", disabled=not es_director),
+        "Bote Bebida (10€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
+        "Noviembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
+        "Diciembre (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
+        "Enero (50€)": st.column_config.SelectboxColumn(options=["Pagado", "Pendiente"], disabled=not es_director),
+        "Total Pagado (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
+        "Total Pendiente (€)": st.column_config.NumberColumn(format="%d €", disabled=True),
     }
 
     edited_df = st.data_editor(
@@ -361,66 +378,44 @@ with tab1:
         use_container_width=True,
         hide_index=True,
         num_rows="dynamic" if es_director else "fixed",
-        height=500,
+        height=450,
     )
 
     if es_director:
-        if st.button(
-            "💾 Guardar Cambios de la Tabla de Cuotas", type="secondary"
-        ):
-            save_df = edited_df.drop(
-                columns=["Total Pagado (€)", "Total Pendiente (€)"]
-            )
+        if st.button("💾 Guardar Cambios Cuotas", type="secondary"):
+            save_df = edited_df.drop(columns=["Total Pagado (€)", "Total Pendiente (€)"])
             save_df.to_csv(DB_CUOTAS, index=False)
-            st.success("¡Cuotas guardadas correctamente en la base de datos!")
+            st.success("¡Cuotas guardadas con éxito!")
             st.rerun()
 
 with tab2:
-    st.subheader("💸 Libro de Movimientos (Gastos e Ingresos)")
-    st.caption(
-        "Usa esta página para apuntar o eliminar lo que entra y sale de la caja"
-        " de la chirigota."
-    )
-
+    st.subheader("💸 Libro de Caja")
+    
     if es_director:
         with st.form("form_movimiento"):
-            c1, c2, c3 = st.columns(3)
-            with c1:
-                fecha = st.date_input("Fecha del Movimiento")
-            with c2:
-                tipo_mov = st.selectbox(
-                    "Tipo de Movimiento", ["Gasto (-)", "Ingreso (+)"]
-                )
-            with c3:
-                categoria = st.selectbox(
-                    "Categoría",
-                    [
-                        "🍺 Bebida / Barra",
-                        "🎭 Telones y Forillo",
-                        "🧵 Telas y Disfraces",
-                        "🎸 Instrumentos / Pitos",
-                        "💰 Subvención / Venta / Años Anteriores",
-                        "📦 Varios",
-                    ],
-                )
-
-            c4, c5, c6 = st.columns(3)
-            with c4:
-                concepto = st.text_input("Concepto (Ej: Remanente año pasado...)")
-            with c5:
-                importe = st.number_input(
-                    "Importe (€)", min_value=0.0, step=1.0, format="%.2f"
-                )
-            with c6:
-                opciones_responsable = [
-                    "Bote Común",
-                    "Caja Años Anteriores (Chirigota)",
-                ] + list(df_cuotas["Componente"])
-                responsable = st.selectbox("Responsable / Pagador", opciones_responsable)
-
-            submit_mov = st.form_submit_button(
-                "➕ Registrar en el Libro de Caja", type="primary"
+            fecha = st.date_input("Fecha")
+            tipo_mov = st.selectbox("Tipo", ["Gasto (-)", "Ingreso (+)"])
+            categoria = st.selectbox(
+                "Categoría",
+                [
+                    "🍺 Bebida / Barra",
+                    "🎭 Telones y Forillo",
+                    "🧵 Telas y Disfraces",
+                    "🎸 Instrumentos / Pitos",
+                    "💰 Subvención / Venta / Años Anteriores",
+                    "📦 Varios",
+                ],
             )
+            concepto = st.text_input("Concepto")
+            importe = st.number_input("Importe (€)", min_value=0.0, step=1.0, format="%.2f")
+            
+            opciones_responsable = [
+                "Bote Común",
+                "Caja Años Anteriores (Chirigota)",
+            ] + list(df_cuotas["Componente"])
+            responsable = st.selectbox("Responsable", opciones_responsable)
+
+            submit_mov = st.form_submit_button("➕ Registrar Movimiento", type="primary")
 
             if submit_mov and concepto != "":
                 tipo_etiqueta = "Ingreso" if tipo_mov == "Ingreso (+)" else "Gasto"
@@ -430,15 +425,12 @@ with tab2:
                 )
                 df_gastos = pd.concat([df_gastos, nuevo_reg], ignore_index=True)
                 df_gastos.to_csv(DB_GASTOS, index=False)
-                st.success("¡Movimiento registrado con éxito!")
+                st.success("¡Registrado con éxito!")
                 st.rerun()
     else:
-        st.info(
-            "ℹ️ Solo el director con la clave secreta puede registrar o modificar"
-            " movimientos de caja."
-        )
+        st.info("ℹ️ Acceso exclusivo para el director (introduce clave en el menú lateral).")
 
-    st.write("### 📜 Historial de Apuntes de Caja")
+    st.write("### 📜 Historial")
 
     def colorear_filas(row):
         tipo = str(row.get("Tipo (Ingreso/Gasto)", "")).strip()
@@ -450,10 +442,9 @@ with tab2:
 
     if not df_gastos.empty:
         if es_director:
-            modo_edicion = st.toggle("✏️ Activar Modo Editor / Borrador de Movimientos", value=False)
+            modo_edicion = st.toggle("✏️ Modo Editor / Borrador", value=False)
             
             if modo_edicion:
-                st.caption("💡 Edita las celdas o elimina filas seleccionando y pulsando la tecla Supr:")
                 edited_gastos = st.data_editor(
                     df_gastos,
                     use_container_width=True,
@@ -461,9 +452,9 @@ with tab2:
                     num_rows="dynamic",
                     key="editor_gastos_tabla",
                 )
-                if st.button("💾 Guardar Cambios del Historial de Caja", type="secondary"):
+                if st.button("💾 Guardar Historial", type="secondary"):
                     edited_gastos.to_csv(DB_GASTOS, index=False)
-                    st.success("¡Historial de caja actualizado correctamente!")
+                    st.success("¡Actualizado!")
                     st.rerun()
             else:
                 st.dataframe(
@@ -478,4 +469,4 @@ with tab2:
                 hide_index=True,
             )
     else:
-        st.info("Todavía no hay movimientos registrados.")
+        st.info("No hay movimientos registrados.")
